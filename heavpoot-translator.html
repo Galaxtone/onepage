@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Heavpoot Solver</title>
+	</head>
+
+	<body style="text-align: center;">
+		<noscript>
+			<h1 style="font-size: 100px; color: #F00;">Javascript is required!</h1>
+		</noscript>
+
+		<div id="content" style="display: none;">
+			<h1>Heavpoot Solver</h1>
+
+			<label for="translation">Select translation:</label>
+			<select id="translation" name="translation">
+				<option value="dvorak">US Dvorak</option>
+				<option value="custom">Custom</option>
+			</select>
+
+			<div id="custom" style="display: none;">
+				<h2>Custom</h2>
+				<label for="custominput">Input Alphabet:</label>
+				<input type="text" id="custominput" name="custominput">
+				<br/>
+
+				<label for="customoutput">Output Alphabet:</label>
+				<input type="text" id="customoutput" name="customoutput">
+				<br/>
+
+				<h3 id="customerror" style="color: #F00; display: none;">Both input and output alphabet must be the same size!</h3>
+			</div>
+
+			<h2>Input and Output</h2>
+			<textarea id="input" cols="80" rows="10"></textarea>
+			<br/>
+
+			<textarea id="output" readonly cols="80" rows="10"></textarea>
+		</div>
+	</body>
+	<script>
+		addEventListener('load', function() {
+			const content = document.getElementById('content');
+			content.style.display = 'block';
+
+			function addChangeListener(element, listener) {
+				element.addEventListener('change', listener);
+				element.addEventListener('keyup', listener);
+				element.addEventListener('paste', listener);
+			}
+
+			const translation = document.getElementById('translation');
+			let selectedTranslation = translation.options[translation.selectedIndex].value;
+
+			let customValid = true;
+			const customInput = document.getElementById('custominput');
+			const customOutput = document.getElementById('customoutput');
+
+			function translate(input, inputAlph, outputAlph) {
+				let output = '';
+				for (let i = 0; i < input.length; i++) {
+					const inputChar = input.charAt(i);
+					const alphIndex = inputAlph.indexOf(inputChar);
+					output += alphIndex == -1 ? inputChar : outputAlph[alphIndex];
+				}
+				return output;
+			}
+
+			const inputText = document.getElementById('input');
+			const outputText = document.getElementById('output');
+
+			const dvorak = '`1234567890[]\',.pyfgcrl/=\\aoeuidhtns-;qjkxbmwvz~!@#$%^&*(){}"<>PYFGCRL?+|AOEUIDHTNS_:QJKXBMWVZ';
+			const qwerty = '`1234567890-=qwertyuiop[]\\asdfghjkl;\'zxcvbnm,./~!@#$%^&*()_+QWERTYUIOP{}|ASDFGHJKL:"ZXCVBNM<>?';
+
+			function inputChanged() {
+				let inputAlph = '';
+				let outputAlph = qwerty;
+
+				switch (selectedTranslation) {
+					case 'dvorak':
+						inputAlph = dvorak;
+						break;
+					case 'custom':
+						if (!customValid) {
+							return;
+						}
+						inputAlph = customInput.value;
+						outputAlph = customOutput.value;
+						break;
+					default:
+						break;
+				}
+
+				outputText.value = translate(inputText.value, inputAlph, outputAlph);
+			}
+
+			addChangeListener(inputText, inputChanged);
+
+			const customError = document.getElementById('customerror');
+			function customCheck() {
+				customValid = customInput.value.length == customOutput.value.length;
+				customError.style.display = customValid ? 'none' : 'block';
+				if (customValid) {
+					inputChanged();
+				}
+			}
+
+			addChangeListener(customInput, customCheck);
+			addChangeListener(customOutput, customCheck);
+
+			const custom = document.getElementById('custom');
+			translation.addEventListener('change', function() {
+				selectedTranslation = translation.options[translation.selectedIndex].value;
+				custom.style.display = selectedTranslation == 'custom' ? 'block' : 'none';
+				customInput.value = customOutput.value = '';
+				customCheck();
+			});
+		});
+	</script>
+</html>
