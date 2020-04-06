@@ -1,4 +1,4 @@
-# /One Page>
+# /One Pagers>
 [Go Back](https://galaxtone.github.io/)
 
 ### Files
